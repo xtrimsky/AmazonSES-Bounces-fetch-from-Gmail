@@ -1,6 +1,13 @@
+This script allows you to fetch from a PHP script every email that have bounced from Amazon to your Gmail account.
+
+Requirements:
+php_imap extension
+IMAP enabled on your Gmail account
+
+
 The example.php should be pretty straight forward.
 
-Basically, you connect to gmail using your IMAP credentials (IMAP must be enabled on Gmail).
+Basically, you connect to gmail using your IMAP credentials.
 You set a label if needed.
 And then you fetch all the emails that have been bounced back by Amazon.
 
