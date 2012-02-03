@@ -1,0 +1,8 @@
+The example.php should be pretty straight forward.
+
+Basically, you connect to gmail using your IMAP credentials (IMAP must be enabled on Gmail).
+You set a label if needed.
+And then you fetch all the emails that have been bounced back by Amazon.
+
+
+If you need it for other bounces then Amazon, it is very easy to change. (line 72 of AmazonSESBounces.php).
