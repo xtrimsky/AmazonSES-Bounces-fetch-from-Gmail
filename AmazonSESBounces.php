@@ -69,11 +69,11 @@ class AmazonSESBounces{
 			$headerinfo = @imap_headerinfo($this->c, $count);
 			$from = $headerinfo->fromaddress;
 			
-			if($from == 'MAILER-DAEMON@email-bounces.amazonses.com'){
+			if($from == 'MAILER-DAEMON@email-bounces.amazonses.com' || $from == 'complaints@email-abuse.amazonses.com'){
 				$body = @imap_body($this->c, $count);
 				
 				$email = $this->parseBody($body);
-				if($email){
+				if($email && strpos($email,'@') !== false){
 					$emails[] = $email;
 					$this->messagesFound[] = $count;
 				}
@@ -85,11 +85,27 @@ class AmazonSESBounces{
 		return $emails;
 	}
 	
-	function parseBody($body, $debug = false){
+	function parseBody($body){
 		$lines = explode("\r\n",$body);
 		
 		foreach($lines as $line){
 			$lookfor = 'Final-Recipient: ';
+			if(substr($line,0,strlen($lookfor)) == $lookfor){
+				$email = substr($line,strlen($lookfor));
+				$email = str_replace('rfc822;','',$email);
+				
+				return $email;
+			}
+			
+			$lookfor = 'X-HmXmrOriginalRecipient: ';
+			if(substr($line,0,strlen($lookfor)) == $lookfor){
+				$email = substr($line,strlen($lookfor));
+				$email = str_replace('rfc822;','',$email);
+				
+				return $email;
+			}
+			
+			$lookfor = 'Original-Rcpt-To: ';
 			if(substr($line,0,strlen($lookfor)) == $lookfor){
 				$email = substr($line,strlen($lookfor));
 				$email = str_replace('rfc822;','',$email);
