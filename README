@@ -1,4 +1,5 @@
 This script allows you to fetch from a PHP script every email that have bounced from Amazon to your Gmail account.
+NEW: Now also handles complaints
 
 Requirements:
 php_imap extension
