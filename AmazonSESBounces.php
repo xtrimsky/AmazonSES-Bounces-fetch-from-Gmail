@@ -73,7 +73,7 @@ class AmazonSESBounces{
 				$body = @imap_body($this->c, $count);
 				
 				$email = $this->parseBody($body);
-				if($email && strpos($email,'@') !== false){
+				if($email){
 					$emails[] = $email;
 					$this->messagesFound[] = $count;
 				}
@@ -92,29 +92,48 @@ class AmazonSESBounces{
 			$lookfor = 'Final-Recipient: ';
 			if(substr($line,0,strlen($lookfor)) == $lookfor){
 				$email = substr($line,strlen($lookfor));
-				$email = str_replace('rfc822;','',$email);
+				$email = $this->cleanEmail($email);
 				
-				return $email;
+				if($this->isEmailValid($email)){ return $email;}
 			}
 			
 			$lookfor = 'X-HmXmrOriginalRecipient: ';
 			if(substr($line,0,strlen($lookfor)) == $lookfor){
 				$email = substr($line,strlen($lookfor));
-				$email = str_replace('rfc822;','',$email);
+				$email = $this->cleanEmail($email);
 				
-				return $email;
+				if($this->isEmailValid($email)){ return $email;}
 			}
 			
 			$lookfor = 'Original-Rcpt-To: ';
 			if(substr($line,0,strlen($lookfor)) == $lookfor){
 				$email = substr($line,strlen($lookfor));
-				$email = str_replace('rfc822;','',$email);
+				$email = $this->cleanEmail($email);
 				
-				return $email;
+				if($this->isEmailValid($email)){ return $email;}
 			}
 		}
 		
 		return false;
+	}
+	
+	/*
+	 * checks if email that was found is real
+	 */
+	function isEmailValid($email){
+		return	$email &&
+				filter_var($email, FILTER_VALIDATE_EMAIL) &&		//valid email
+				strpos($email,'redacted@') !== 0;					//email has been redacted, wrong email
+	}
+	
+	/*
+	 * makes sure email is well formated
+	 */
+	function cleanEmail($email){
+		$email = str_ireplace('rfc822;','',$email);
+		$email = trim($email);
+		
+		return $email;
 	}
 	
 	/*
