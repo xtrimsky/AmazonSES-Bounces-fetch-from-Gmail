@@ -112,6 +112,14 @@ class AmazonSESBounces{
 				
 				if($this->isEmailValid($email)){ return $email;}
 			}
+			
+			$lookfor = 'Original-Recipient: ';
+			if(substr($line,0,strlen($lookfor)) == $lookfor){
+				$email = substr($line,strlen($lookfor));
+				$email = $this->cleanEmail($email);
+				
+				if($this->isEmailValid($email)){ return $email;}
+			}
 		}
 		
 		return false;
@@ -130,7 +138,7 @@ class AmazonSESBounces{
 	 * makes sure email is well formated
 	 */
 	function cleanEmail($email){
-		$email = str_ireplace('rfc822;','',$email);
+		$email = str_ireplace(array('rfc822;','<','>'),'',$email);
 		$email = trim($email);
 		
 		return $email;
@@ -142,9 +150,15 @@ class AmazonSESBounces{
 	function deleteEmailsFound(){
 		if(!$this->c){return false;}
 		
-		foreach($this->messagesFound as $count){
-			@imap_delete($this->c, $count);
+		foreach($this->messagesFound as $message_id){
+			$this->deleteEmail($message_id);
 		}
+	}
+	
+	function deleteEmail($message_id){
+		if(!$this->c){return false;}
+		
+		@imap_delete($this->c, $message_id);
 	}
 	
 	/*
